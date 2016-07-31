@@ -3,12 +3,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.template import loader
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, redirect
-
-
-def login_landing(request):
-    return HttpResponse(request, 'PartyShiftSchedule/login.html', {})
 
 
 def login_user(request):
@@ -20,7 +17,11 @@ def login_user(request):
     user = authenticate(username=username, password=password)
 
     if user is not None:
-        login(request, user)
-        return HttpResponseRedirect('/login_landing')
+        login(request, user=user)
+        return render(request, 'PartyShiftSchedule/landingPage.html', {'username': username})
 
-    return HttpResponse("Yeah! Success!")
+    return HttpResponseRedirect('/login_landing')
+
+@login_required(login_url='/login/')
+def foo(request):
+    return render(request, 'PartyShiftSchedule/landingPage.html', {'username': 'whoever you are'})
