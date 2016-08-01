@@ -12,6 +12,6 @@ class LdapUser(models.Model):
         return fullname % self.firstname, self.lastname
 
 class ShiftScheduleSlot(models.Model):
-    time = models.DateTimeField(unique=False)
+    time = models.TimeField(unique=False)
     position = models.TextField(unique=False)
     user = models.OneToOneField(User, unique=False)
