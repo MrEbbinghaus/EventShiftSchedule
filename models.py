@@ -14,4 +14,8 @@ class LdapUser(models.Model):
 class ShiftScheduleSlot(models.Model):
     time = models.TimeField(unique=False)
     position = models.TextField(unique=False)
-    user = models.OneToOneField(User, unique=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        information = "%s: %s, %s Uhr"
+        return information % (str(self.user), self.position, str(self.time))
