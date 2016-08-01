@@ -10,3 +10,8 @@ class LdapUser(models.Model):
     def __str__(self):
         fullname = "%s %s"
         return fullname % self.firstname, self.lastname
+
+class ShiftScheduleSlot(models.Model):
+    time = models.DateTimeField(unique=False)
+    position = models.TextField(unique=False)
+    user = models.OneToOneField(User, unique=False)
