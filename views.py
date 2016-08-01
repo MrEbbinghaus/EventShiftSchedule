@@ -24,4 +24,5 @@ def login_user(request):
 
 @login_required(login_url='/login/')
 def foo(request):
-    return render(request, 'PartyShiftSchedule/landingPage.html', {'username': 'whoever you are'})
+    user = request.user
+    return render(request, 'PartyShiftSchedule/landingPage.html', {'username': user})
