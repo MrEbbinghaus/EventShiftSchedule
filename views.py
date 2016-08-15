@@ -6,9 +6,10 @@ from django.template import loader
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, redirect
-from itertools import combinations, chain, product
 
-from .models import ShiftScheduleSlot, Time, Position
+from datetime import date
+
+from .models import Slot, Position, Party
 
 
 def login_user(request):
@@ -33,28 +34,15 @@ def foo(request):
 
 
 def shift_schedule(request):
-    query_results = ShiftScheduleSlot.objects.all()
+    query_results = Slot.objects.all()
     positions = Position.objects.all()
-    times = Time.objects.all().order_by('time')
-    rows = list()
-    table = slots_to_table()
 
-    # TODO make it beautiful
-    for time in times:
-        row = [time.time]
-        for position in positions:
-            entrys = list()
-            if frozenset({time, position}) in table.keys():
-                entrys = [table[frozenset({time, position})]]
-                row += entrys
+    # TODO: Get the party from somewhere else. Dropdown menu, if the tool is used for more then one upcoming party?
+    next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
+    if len(next_partys) == 0:
+        return
 
-
-            if len(entrys) < position.pref_users:
-                for i in range(0,  position.pref_users - len(entrys)):
-                    row.append("")
-
-
-        rows.append(row)
+    rows = slots_to_table(next_partys[0])
 
     context = {
         'query_results': query_results,
@@ -64,12 +52,11 @@ def shift_schedule(request):
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context)
 
 
-def slots_to_table():
+def slots_to_table(party):
     table = dict()
-    times = Time.objects.all()
+    slots = Slot.objects.filter(party=party)
     positions = Position.objects.all()
-    slots = ShiftScheduleSlot.objects.all()
-    key_set = map(set, product(times, positions))
+    rows = list()
 
     for slot in slots:
         table[frozenset({slot.time, slot.position})] = slot.user
@@ -77,4 +64,17 @@ def slots_to_table():
     for e in table:  # debug
         print(e, table[e])
 
-    return table
+    # TODO make it beautiful
+    #     for position in positions:
+    #         entrys = list()
+    #         if frozenset({time, position}) in table.keys():
+    #             entrys = [table[frozenset({time, position})]]
+    #             row += entrys
+    #
+    #         if len(entrys) < position.pref_users:
+    #             for i in range(0,  position.pref_users - len(entrys)):
+    #                 row.append("")
+    #
+    #     rows.append(row)
+
+    return rows
