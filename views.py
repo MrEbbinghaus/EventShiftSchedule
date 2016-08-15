@@ -6,9 +6,6 @@ from django.template import loader
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, redirect
-from itertools import combinations, chain, product
-
-from .models import ShiftScheduleSlot, Time, Position
 
 from datetime import date
 
@@ -37,30 +34,6 @@ def foo(request):
 
 
 def shift_schedule(request):
-<<<<<<< HEAD
-    query_results = ShiftScheduleSlot.objects.all()
-    positions = Position.objects.all()
-    times = Time.objects.all().order_by('time')
-    rows = list()
-    table = slots_to_table()
-
-    # TODO make it beautiful
-    for time in times:
-        row = [time.time]
-        for position in positions:
-            entrys = list()
-            if frozenset({time, position}) in table.keys():
-                entrys = [table[frozenset({time, position})]]
-                row += entrys
-
-
-            if len(entrys) < position.pref_users:
-                for i in range(0,  position.pref_users - len(entrys)):
-                    row.append("")
-
-
-        rows.append(row)
-=======
     query_results = Slot.objects.all()
     positions = Position.objects.all()
 
@@ -70,7 +43,6 @@ def shift_schedule(request):
         return
 
     rows = slots_to_table(next_partys[0])
->>>>>>> master
 
     context = {
         'query_results': query_results,
@@ -80,20 +52,11 @@ def shift_schedule(request):
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context)
 
 
-<<<<<<< HEAD
-def slots_to_table():
-    table = dict()
-    times = Time.objects.all()
-    positions = Position.objects.all()
-    slots = ShiftScheduleSlot.objects.all()
-    key_set = map(set, product(times, positions))
-=======
 def slots_to_table(party):
     table = dict()
     slots = Slot.objects.filter(party=party)
     positions = Position.objects.all()
     rows = list()
->>>>>>> master
 
     for slot in slots:
         table[frozenset({slot.time, slot.position})] = slot.user
@@ -101,9 +64,6 @@ def slots_to_table(party):
     for e in table:  # debug
         print(e, table[e])
 
-<<<<<<< HEAD
-    return table
-=======
     # TODO make it beautiful
     #     for position in positions:
     #         entrys = list()
@@ -118,4 +78,3 @@ def slots_to_table(party):
     #     rows.append(row)
 
     return rows
->>>>>>> master
