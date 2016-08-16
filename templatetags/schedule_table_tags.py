@@ -8,10 +8,9 @@ def schedule_table_row(row):
     return """
         <tr>
             {0}
-        <tr>
+        </tr>
     """.format('\n'.join(map(to_td, row)))
 
 
-@register.filter
 def to_td(value):
     return "<td>{0}</td>".format(value)
