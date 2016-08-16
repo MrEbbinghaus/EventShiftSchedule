@@ -7,9 +7,10 @@ register = template.Library()
 def schedule_table_row(row):
     return """
         <tr>
-            {0}
+            <td class="shift-schedule-head-col">{0}</td>
+            {1}
         </tr>
-    """.format('\n'.join(map(to_td, row)))
+    """.format(row[0], '\n'.join(map(to_td, row[1:])))
 
 
 def to_td(value):
