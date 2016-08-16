@@ -34,7 +34,7 @@ class Time(models.Model):
         unique_together = ('beginning', 'duration', 'party')
 
     def __str__(self):
-        return str(self.time)
+        return str(self.beginning)
 
 
 class Slot(models.Model):
