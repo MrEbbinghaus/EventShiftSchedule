@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, redirect
 
 from datetime import date
+from PartyShiftSchedule.templatetags.schedule_table_tags import toggle_button
 import itertools
 
 from .models import Slot, Position, Party, Time
@@ -38,17 +39,23 @@ def get_schedule_row(time, party, user):
     slots = Slot.objects.filter(time=time)
     positions = Position.objects.filter(party=party)
     row = [time]
-    toggle_button = "<a class=tableToggleButton>{0}</a>".format(user)
 
     for position in positions:
         pos_slots = slots.filter(position=position)
         row += [pos_slot.user for pos_slot in pos_slots]
-        # pad to the right
-        for _ in itertools.repeat(None, (position.pref_users - len(pos_slots))):
-            row.append(toggle_button)
+
+        # pad to the right with buttons up to position.pref_users
+        row = pad_list(row, toggle_button(user), position.pref_users - len(pos_slots))
+
 
     print(row)
     return [str(e) for e in row]
+
+
+def pad_list(l, pad, c):
+    for _ in itertools.repeat(None, c):
+        l.append(pad)
+    return l
 
 
 def get_next_party():
