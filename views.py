@@ -12,21 +12,6 @@ from datetime import date
 from .models import Slot, Position, Party, Time
 
 
-def login_user(request):
-    logout(request)
-    username = password = ''
-    if request.POST:
-        username = request.POST['username']
-        password = request.POST['password']
-    user = authenticate(username=username, password=password)
-
-    if user is not None:
-        login(request, user=user)
-        return render(request, 'PartyShiftSchedule/landingPage.html', {'username': username})
-
-    return HttpResponseRedirect('/login_landing')
-
-
 @login_required(login_url='/login/')
 def foo(request):
     user = request.user
