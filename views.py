@@ -13,7 +13,7 @@ from .models import Slot, Position, Party, Time
 
 
 @login_required(login_url='/login/')
-def foo(request):
+def pss_landing(request):
     user = request.user
     return render(request, 'PartyShiftSchedule/landingPage.html', {'username': user})
 
