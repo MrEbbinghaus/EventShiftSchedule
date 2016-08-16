@@ -9,7 +9,7 @@ from django.shortcuts import render_to_response, redirect
 
 from datetime import date
 
-from .models import Slot, Position, Party
+from .models import Slot, Position, Party, Time
 
 
 def login_user(request):
@@ -34,47 +34,37 @@ def foo(request):
 
 
 def shift_schedule(request):
-    query_results = Slot.objects.all()
+    next_party = get_next_party()
     positions = Position.objects.all()
+    rows = list()
 
-    # TODO: Get the party from somewhere else. Dropdown menu, if the tool is used for more then one upcoming party?
-    next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
-    if len(next_partys) == 0:
-        return
-
-    rows = slots_to_table(next_partys[0])
+    times = Time.objects.filter(party=next_party)
+    rows += [get_schedule_row(time, next_party) for time in times]
 
     context = {
-        'query_results': query_results,
         'positions': positions,
         'rows': rows
     }
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context)
 
 
-def slots_to_table(party):
-    table = dict()
-    slots = Slot.objects.filter(party=party)
-    positions = Position.objects.all()
-    rows = list()
+def get_schedule_row(time, party):
+    slots = Slot.objects.filter(time=time)
+    positions = Position.objects.filter(party=party)
+    row = [time]
 
-    for slot in slots:
-        table[frozenset({slot.time, slot.position})] = slot.user
+    for position in positions:
+        pos_slots = slots.filter(position=position)
+        row += [pos_slot.user for pos_slot in pos_slots]
+        # pad to the right
+        row += [''] * (position.pref_users - len(pos_slots))
 
-    for e in table:  # debug
-        print(e, table[e])
+    return [str(e) for e in row]
 
-    # TODO make it beautiful
-    #     for position in positions:
-    #         entrys = list()
-    #         if frozenset({time, position}) in table.keys():
-    #             entrys = [table[frozenset({time, position})]]
-    #             row += entrys
-    #
-    #         if len(entrys) < position.pref_users:
-    #             for i in range(0,  position.pref_users - len(entrys)):
-    #                 row.append("")
-    #
-    #     rows.append(row)
 
-    return rows
+def get_next_party():
+    # TODO: Get the party from somewhere else. Dropdown menu, if the tool is used for more then one upcoming party?
+    next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
+    if len(next_partys) == 0:
+        return
+    return next_partys[0]
