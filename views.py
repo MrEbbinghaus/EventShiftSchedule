@@ -22,7 +22,7 @@ def login_user(request):
 
     if user is not None:
         login(request, user=user)
-        return render(request, 'PartyShiftSchedule/landingPage.html', {'username': username})
+        return render(request, 'PartyShiftSchedule/landing_page.html', {'username': username})
 
     return HttpResponseRedirect('/login_landing')
 
@@ -30,7 +30,7 @@ def login_user(request):
 @login_required(login_url='/login/')
 def foo(request):
     user = request.user
-    return render(request, 'PartyShiftSchedule/landingPage.html', {'username': user})
+    return render(request, 'PartyShiftSchedule/landing_page.html', {'username': user})
 
 
 def shift_schedule(request):
