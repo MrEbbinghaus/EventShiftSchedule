@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, redirect
 
 from datetime import date
+import itertools
 
 from .models import Slot, Position, Party, Time
 
@@ -24,7 +25,7 @@ def shift_schedule(request):
     rows = list()
 
     times = Time.objects.filter(party=next_party)
-    rows += [get_schedule_row(time, next_party) for time in times]
+    rows += [get_schedule_row(time, next_party, request.user) for time in times]
 
     context = {
         'positions': positions,
@@ -33,17 +34,20 @@ def shift_schedule(request):
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context)
 
 
-def get_schedule_row(time, party):
+def get_schedule_row(time, party, user):
     slots = Slot.objects.filter(time=time)
     positions = Position.objects.filter(party=party)
     row = [time]
+    toggle_button = "<a class=tableToggleButton>{0}</a>".format(user)
 
     for position in positions:
         pos_slots = slots.filter(position=position)
         row += [pos_slot.user for pos_slot in pos_slots]
         # pad to the right
-        row += [''] * (position.pref_users - len(pos_slots))
+        for _ in itertools.repeat(None, (position.pref_users - len(pos_slots))):
+            row.append(toggle_button)
 
+    print(row)
     return [str(e) for e in row]
 
 
