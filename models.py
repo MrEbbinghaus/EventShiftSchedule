@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
 class Party(models.Model):
     date = models.DateField(blank=False)
     name = models.TextField(blank=True)
@@ -25,11 +26,12 @@ class Position(models.Model):
 
 
 class Time(models.Model):
-    time = models.TimeField()
+    beginning = models.TimeField()
+    duration = models.FloatField(default=1.5)
     party = models.ForeignKey(Party, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('time', 'party')
+        unique_together = ('beginning', 'duration', 'party')
 
     def __str__(self):
         return str(self.time)
