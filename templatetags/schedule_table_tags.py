@@ -14,3 +14,6 @@ def schedule_table_row(row):
 
 def to_td(value):
     return "<td>{0}</td>".format(value)
+
+def toggle_button(user):
+    return "<a class=tableToggleButton>{0}</a>".format(user)
