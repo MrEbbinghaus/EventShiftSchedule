@@ -24,8 +24,19 @@ class Position(models.Model):
         return "{0}({1})".format(self.name, self.pref_users)
 
 
-class Slot(models.Model):
+class Time(models.Model):
     time = models.TimeField()
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('time', 'party')
+
+    def __str__(self):
+        return str(self.time)
+
+
+class Slot(models.Model):
+    time = models.ForeignKey(Time, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     party = models.ForeignKey(Party, on_delete=models.CASCADE)
