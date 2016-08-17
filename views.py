@@ -19,20 +19,18 @@ def pss_landing(request):
     user = request.user
     return render(request, 'PartyShiftSchedule/landing_page.html', {'username': user})
 
-
+@login_required(login_url='/login/')
 def shift_schedule(request):
     next_party = get_next_party()
     positions = Position.objects.all()
-    rows = list()
-
     times = Time.objects.filter(party=next_party)
-    rows += [get_schedule_row(time, next_party, request.user) for time in times]
+    rows = [get_schedule_row(time, next_party, request.user) for time in times]
 
     context = {
         'positions': positions,
         'rows': rows
     }
-    return render(request, 'PartyShiftSchedule/shift_schedule.html', context)
+    return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
 
 
 def get_schedule_row(time, party, user):
@@ -47,9 +45,19 @@ def get_schedule_row(time, party, user):
         # pad to the right with buttons up to position.pref_users
         row = pad_list(row, toggle_button(user), position.pref_users - len(pos_slots))
 
-
-    print(row)
     return [str(e) for e in row]
+
+@login_required(login_url='/login/')
+def shift_schedule_enter(request):
+    next_party = get_next_party()
+    times = Time.objects.filter(party=next_party)
+    positions = Position.objects.filter(party=next_party)
+
+    context = {
+        'times': times,
+        'positions': positions,
+    }
+    return render(request, 'PartyShiftSchedule/shift_schedule_enter.html', context=context)
 
 
 def pad_list(l, pad, c):
