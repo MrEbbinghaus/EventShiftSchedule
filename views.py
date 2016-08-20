@@ -47,6 +47,7 @@ def get_schedule_row(time, party, user):
 
     return [str(e) for e in row]
 
+
 @login_required(login_url='/login/')
 def shift_schedule_enter(request):
     next_party = get_next_party()
@@ -58,6 +59,31 @@ def shift_schedule_enter(request):
         'positions': positions,
     }
     return render(request, 'PartyShiftSchedule/shift_schedule_enter.html', context=context)
+
+
+@login_required(login_url='/login/')
+def enter(request):
+    if request.method == 'POST':
+        data = request.POST
+        checked = True if data['checked'] == 'true' else False
+        next_party = get_next_party()
+        time = Time.objects.get(beginning=data['time'], party=next_party)
+        position = Position.objects.get(name=data['position'], party=next_party)
+        user = request.user
+
+        slot = Slot.objects.filter(time=time, position=position, user=user, party=next_party)
+
+        if not slot.exists() and checked:
+            Slot(time=time, position=position, user=user, party=next_party).save()
+
+        elif slot.exists() and not checked:
+            slot[0].delete()
+
+        print("Debug: {0} {1} {2}".format(data['checked'], data['time'], data['position']))
+
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=405)  # 405: Method not allowed
 
 
 def pad_list(l, pad, c):
