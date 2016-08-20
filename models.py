@@ -41,7 +41,7 @@ class Slot(models.Model):
     time = models.ForeignKey(Time, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    party = models.ForeignKey(Party, on_delete=models.CASCADE)
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)  # redundant you can get party from time or position
 
     class Meta:
         unique_together = ('time', 'position', 'user', 'party')
