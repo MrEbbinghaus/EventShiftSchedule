@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from datetime import timedelta, timezone
+from time import tzname
 
 
 class Party(models.Model):
@@ -10,7 +12,7 @@ class Party(models.Model):
 
     def __str__(self):
         return "{0} am {1}".format(self.name, self.date) if self.name \
-            else self.date
+            else str(self.date)
 
 
 class Position(models.Model):
@@ -26,15 +28,18 @@ class Position(models.Model):
 
 
 class Time(models.Model):
-    beginning = models.TimeField()
-    duration = models.FloatField(default=1.5)
+    beginning = models.DateTimeField()
+    duration = models.FloatField(default=2)
     party = models.ForeignKey(Party, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('beginning', 'duration', 'party')
 
     def __str__(self):
-        return str(self.beginning)
+        display = "{0} - {1}"
+        ending = self.beginning + timedelta(hours=self.duration)
+
+        return display.format(self.beginning.time().strftime("%H:%M"), ending.time().strftime("%H:%M"))
 
 
 class Slot(models.Model):

@@ -24,7 +24,7 @@ def pss_landing(request):
 def shift_schedule(request):
     next_party = _get_next_party()
     positions = Position.objects.all()
-    times = Time.objects.filter(party=next_party)
+    times = Time.objects.filter(party=next_party).order_by('beginning')
 
     context = {
         'positions': positions,
@@ -51,7 +51,7 @@ def _get_schedule_row(time, party, user):
 @login_required(login_url='/login/')
 def shift_schedule_enter(request):
     next_party = _get_next_party()
-    times = Time.objects.filter(party=next_party)
+    times = Time.objects.filter(party=next_party).order_by('beginning')
     positions = Position.objects.filter(party=next_party)
 
     context = {
@@ -64,11 +64,11 @@ def shift_schedule_enter(request):
 @login_required(login_url='/login/')
 def enter(request):
     if request.method == 'POST':
-        data = request.POST
-        checked = True if data['checked'] == 'true' else False
+        post = request.POST
+        checked = True if post['checked'] == 'true' else False
         next_party = _get_next_party()
-        time = Time.objects.get(beginning=data['time'], party=next_party)
-        position = Position.objects.get(name=data['position'], party=next_party)
+        time = Time.objects.get(id=post['time'], party=next_party) # do not remove party!
+        position = Position.objects.get(id=post['position'], party=next_party)
         user = request.user
 
         slot = Slot.objects.filter(time=time, position=position, user=user, party=next_party)
@@ -79,7 +79,7 @@ def enter(request):
         elif slot.exists() and not checked:
             slot[0].delete()
 
-        print("Debug: {0} {1} {2}".format(data['checked'], data['time'], data['position']))
+        print("Debug: {0} {1} {2}".format(post['checked'], post['time'], post['position']))
 
         return HttpResponse(status=200)
 
