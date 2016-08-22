@@ -49,19 +49,6 @@ def _get_schedule_row(time, party, user):
 
 
 @login_required(login_url='/login/')
-def shift_schedule_enter(request):
-    next_party = _get_next_party()
-    times = Time.objects.filter(party=next_party).order_by('beginning')
-    positions = Position.objects.filter(party=next_party)
-
-    context = {
-        'times': times,
-        'positions': positions,
-    }
-    return render(request, 'PartyShiftSchedule/shift_schedule_enter.html', context=context)
-
-
-@login_required(login_url='/login/')
 def enter(request):
     if request.method == 'POST':
         post = request.POST
