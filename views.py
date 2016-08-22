@@ -19,12 +19,13 @@ def pss_landing(request):
     user = request.user
     return render(request, 'PartyShiftSchedule/landing_page.html', {'username': user})
 
+
 @login_required(login_url='/login/')
 def shift_schedule(request):
-    next_party = get_next_party()
+    next_party = _get_next_party()
     positions = Position.objects.all()
     times = Time.objects.filter(party=next_party)
-    rows = [get_schedule_row(time, next_party, request.user) for time in times]
+    rows = [_get_schedule_row(time, next_party, request.user) for time in times]
 
     context = {
         'positions': positions,
@@ -33,7 +34,7 @@ def shift_schedule(request):
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
 
 
-def get_schedule_row(time, party, user):
+def _get_schedule_row(time, party, user):
     slots = Slot.objects.filter(time=time)
     positions = Position.objects.filter(party=party)
     row = [time]
@@ -50,7 +51,7 @@ def get_schedule_row(time, party, user):
 
 @login_required(login_url='/login/')
 def shift_schedule_enter(request):
-    next_party = get_next_party()
+    next_party = _get_next_party()
     times = Time.objects.filter(party=next_party)
     positions = Position.objects.filter(party=next_party)
 
@@ -66,13 +67,12 @@ def enter(request):
     if request.method == 'POST':
         data = request.POST
         checked = True if data['checked'] == 'true' else False
-        next_party = get_next_party()
+        next_party = _get_next_party()
         time = Time.objects.get(beginning=data['time'], party=next_party)
         position = Position.objects.get(name=data['position'], party=next_party)
         user = request.user
 
         slot = Slot.objects.filter(time=time, position=position, user=user, party=next_party)
-
         if not slot.exists() and checked:
             Slot(time=time, position=position, user=user, party=next_party).save()
 
@@ -92,7 +92,7 @@ def pad_list(l, pad, c):
     return l
 
 
-def get_next_party():
+def _get_next_party():
     # TODO: Get the party from somewhere else. Dropdown menu, if the tool is used for more then one upcoming party?
     next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
     if len(next_partys) == 0:
