@@ -22,7 +22,7 @@ def pss_landing(request):
 
 @login_required(login_url='/login/')
 def shift_schedule(request):
-    next_party = get_next_party()
+    next_party = _get_next_party()
     positions = Position.objects.all()
     times = Time.objects.filter(party=next_party)
 
@@ -33,9 +33,24 @@ def shift_schedule(request):
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
 
 
+def _get_schedule_row(time, party, user):
+    slots = Slot.objects.filter(time=time)
+    positions = Position.objects.filter(party=party)
+    row = [time]
+
+    for position in positions:
+        pos_slots = slots.filter(position=position)
+        row += [pos_slot.user for pos_slot in pos_slots]
+
+        # pad to the right with buttons up to position.pref_users
+        row = pad_list(row, toggle_button(user), position.pref_users - len(pos_slots))
+
+    return [str(e) for e in row]
+
+
 @login_required(login_url='/login/')
 def shift_schedule_enter(request):
-    next_party = get_next_party()
+    next_party = _get_next_party()
     times = Time.objects.filter(party=next_party)
     positions = Position.objects.filter(party=next_party)
 
@@ -51,7 +66,7 @@ def enter(request):
     if request.method == 'POST':
         data = request.POST
         checked = True if data['checked'] == 'true' else False
-        next_party = get_next_party()
+        next_party = _get_next_party()
         time = Time.objects.get(beginning=data['time'], party=next_party)
         position = Position.objects.get(name=data['position'], party=next_party)
         user = request.user
@@ -77,7 +92,7 @@ def pad_list(l, pad, c):
     return l
 
 
-def get_next_party():
+def _get_next_party():
     # TODO: Get the party from somewhere else. Dropdown menu, if the tool is used for more then one upcoming party?
     next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
     if len(next_partys) == 0:
