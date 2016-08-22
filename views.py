@@ -19,33 +19,18 @@ def pss_landing(request):
     user = request.user
     return render(request, 'PartyShiftSchedule/landing_page.html', {'username': user})
 
+
 @login_required(login_url='/login/')
 def shift_schedule(request):
     next_party = get_next_party()
     positions = Position.objects.all()
     times = Time.objects.filter(party=next_party)
-    rows = [get_schedule_row(time, next_party, request.user) for time in times]
 
     context = {
         'positions': positions,
-        'rows': rows
+        'times': times,
     }
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
-
-
-def get_schedule_row(time, party, user):
-    slots = Slot.objects.filter(time=time)
-    positions = Position.objects.filter(party=party)
-    row = [time]
-
-    for position in positions:
-        pos_slots = slots.filter(position=position)
-        row += [pos_slot.user for pos_slot in pos_slots]
-
-        # pad to the right with buttons up to position.pref_users
-        row = pad_list(row, toggle_button(user), position.pref_users - len(pos_slots))
-
-    return [str(e) for e in row]
 
 
 @login_required(login_url='/login/')
