@@ -52,7 +52,7 @@ def _get_schedule_row(time, party, user):
 def enter(request):
     if request.method == 'POST':
         post = request.POST
-        checked = True if post['checked'] == 'true' else False
+        checked = post['checked'] == 'true'
         next_party = _get_next_party()
         time = Time.objects.get(id=post['time'], party=next_party) # do not remove party!
         position = Position.objects.get(id=post['position'], party=next_party)
