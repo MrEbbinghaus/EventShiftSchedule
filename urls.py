@@ -5,5 +5,5 @@ from . import views
 urlpatterns = [
     url(r'^$', views.pss_landing, name='pss_landing'),
     url(r'^pss/$', views.shift_schedule, name='shift_schedule'),
-    url(r'^post/enter/$', views.enter, name='enter'),
+    url(r'^pss/post/enter/$', views.enter, name='enter'),
 ]

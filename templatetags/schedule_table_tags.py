@@ -19,6 +19,8 @@ def table_block(time, position):
     entrys = Slot.objects.filter(time=time, position=position)
     return {
         'entrys': list(entrys),
+        'time_id': time.id,
+        'position_id': position.id,
         'free_slot': len(entrys) < position.pref_users
     }
 
