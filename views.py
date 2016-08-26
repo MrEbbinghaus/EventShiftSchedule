@@ -39,14 +39,14 @@ def enter(request):
         post = request.POST
         checked = post['checked'] == 'true'
         next_party = _get_next_party()
-        time = Time.objects.get(id=post['time'], party=next_party) # do not remove party!
+        time = Time.objects.get(id=post['time'], party=next_party)  # do not remove party!
         position = Position.objects.get(id=post['position'], party=next_party)
         user = request.user
 
-        slot = Slot.objects.filter(time=time, position=position, user=user, party=next_party)
+        slot = Slot.objects.filter(time=time, position=position, user=user)
 
         if not slot.exists() and checked:
-            Slot(time=time, position=position, user=user, party=next_party).save()
+            Slot(time=time, position=position, user=user).save()
 
         elif slot.exists() and not checked:
             slot[0].delete()
@@ -65,7 +65,6 @@ def pad_list(l, pad, c):
 
 
 def _get_next_party():
-    # TODO: Get the party from somewhere else. Dropdown menu, if the tool is used for more then one upcoming party?
     next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
     if len(next_partys) == 0:
         return

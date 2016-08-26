@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from datetime import timedelta, timezone
-from time import tzname
+from datetime import timedelta
 
 
 class Party(models.Model):
@@ -29,7 +28,7 @@ class Position(models.Model):
 
 class Time(models.Model):
     beginning = models.DateTimeField()
-    duration = models.FloatField(default=2)
+    duration = models.FloatField(default=2, blank=True)
     party = models.ForeignKey(Party, on_delete=models.CASCADE)
 
     class Meta:
@@ -46,10 +45,9 @@ class Slot(models.Model):
     time = models.ForeignKey(Time, on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    party = models.ForeignKey(Party, on_delete=models.CASCADE)  # redundant you can get party from time or position
 
     class Meta:
-        unique_together = ('time', 'position', 'user', 'party')
+        unique_together = ('time', 'user')
 
     def __str__(self):
         display = "{0}: {1}, {2} Uhr"
