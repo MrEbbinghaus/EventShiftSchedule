@@ -15,14 +15,19 @@ def schedule_table_row(row):
 
 
 @register.inclusion_tag('PartyShiftSchedule/table_entry_block.html')
-def table_block(time, position):
+def table_block(time, position, user):
     entrys = Slot.objects.filter(time=time, position=position)
     return {
         'entrys': list(entrys),
         'time_id': time.id,
         'position_id': position.id,
-        'free_slot': len(entrys) < position.pref_users
+        'free_slot': len(entrys) < position.pref_users,
+        'precheck': 'checked' if signed_up_for(user, time=time, position=position) else 'unchecked',
     }
+
+
+def signed_up_for(user, time, position):
+    return Slot.objects.filter(user=user, time=time, position=position).exists()
 
 
 def to_td(value):

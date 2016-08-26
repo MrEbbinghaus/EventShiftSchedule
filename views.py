@@ -28,6 +28,7 @@ def shift_schedule(request):
     context = {
         'positions': positions,
         'times': times,
+        'user': request.user,
     }
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
 
