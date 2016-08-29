@@ -39,7 +39,7 @@ def enter(request):
         post = request.POST
         checked = post['checked'] == 'true'
         next_party = _get_next_party()
-        time = Time.objects.get(id=post['time'], party=next_party)  # do not remove party!
+        time = Time.objects.get(id=post['time'], party=next_party)
         position = Position.objects.get(id=post['position'], party=next_party)
         user = request.user
 
