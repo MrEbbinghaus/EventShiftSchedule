@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from datetime import date
 import itertools
 
-from .models import Slot, Position, Party, Time
+from .models import Slot, Position, Event, Time
 
 
 def pss_landing(request):
@@ -16,18 +16,18 @@ def pss_landing(request):
 
 @login_required()
 def shift_schedule(request):
-    return redirect("event/{}".format(_get_next_party()))
+    return redirect("event/{}".format(_get_next_event()))
 
 
 @login_required()
 def shift_schedule_event(request, event_id):
     try:
-        next_party = Party.objects.get(id=event_id)
-    except Party.DoesNotExist:
+        next_event = Event.objects.get(id=event_id)
+    except Event.DoesNotExist:
         raise Http404
 
-    positions = Position.objects.all()
-    times = Time.objects.filter(party=next_party).order_by('beginning')
+    positions = Position.objects.filter(event=next_event)
+    times = Time.objects.filter(event=next_event).order_by('beginning')
 
     context = {
         'positions': positions,
@@ -42,9 +42,9 @@ def enter(request):
     if request.method == 'POST':
         post = request.POST
         checked = post['checked'] == 'true'
-        next_party = Party.objects.get(id=_get_next_party())
-        time = Time.objects.get(id=post['time'], party=next_party)
-        position = Position.objects.get(id=post['position'], party=next_party)
+        next_event = Event.objects.get(id=_get_next_event())
+        time = Time.objects.get(id=post['time'], party=next_event)
+        position = Position.objects.get(id=post['position'], party=next_event)
         user = request.user
 
         slot = Slot.objects.filter(time=time, position=position, user=user)
@@ -68,8 +68,8 @@ def pad_list(l, pad, c):
     return l
 
 
-def _get_next_party():
-    next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
-    if len(next_partys) == 0:
+def _get_next_event():
+    next_events = Event.objects.filter(date__gte=date.today()).order_by('date')
+    if len(next_events) == 0:
         return
-    return next_partys[0].id
+    return next_events[0].id

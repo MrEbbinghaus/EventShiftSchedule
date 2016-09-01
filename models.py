@@ -3,9 +3,9 @@ from django.db import models
 from datetime import timedelta
 
 
-class Party(models.Model):
+class Event(models.Model):
     date = models.DateField(blank=False)
-    name = models.TextField(blank=True)
+    name = models.CharField(blank=True, max_length=64)
     location = models.TextField(blank=True)
     person_in_charge = models.ForeignKey(User, blank=True)
 
@@ -17,10 +17,10 @@ class Party(models.Model):
 class Position(models.Model):
     name = models.CharField(max_length=32)
     pref_users = models.PositiveIntegerField(default=3)
-    party = models.ForeignKey(Party, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('name', 'party')
+        unique_together = ('name', 'event')
 
     def __str__(self):
         return "{0}({1})".format(self.name, self.pref_users)
@@ -29,10 +29,11 @@ class Position(models.Model):
 class Time(models.Model):
     beginning = models.DateTimeField()
     duration = models.FloatField(default=2, blank=True)
-    party = models.ForeignKey(Party, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    alt_name = models.CharField(blank=True, max_length=32)
 
     class Meta:
-        unique_together = ('beginning', 'duration', 'party')
+        unique_together = ('beginning', 'duration', 'event')
 
     def __str__(self):
         display = "{0} - {1}"
