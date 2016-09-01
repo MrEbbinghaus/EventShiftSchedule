@@ -1,14 +1,9 @@
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.template import RequestContext
-from django.template import loader
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import redirect
 
 from datetime import date
-from PartyShiftSchedule.templatetags.schedule_table_tags import toggle_button
 import itertools
 
 from .models import Slot, Position, Party, Time
@@ -21,7 +16,16 @@ def pss_landing(request):
 
 @login_required()
 def shift_schedule(request):
-    next_party = _get_next_party()
+    return redirect("event/{}".format(_get_next_party()))
+
+
+@login_required()
+def shift_schedule_event(request, event_id):
+    try:
+        next_party = Party.objects.get(id=event_id)
+    except Party.DoesNotExist:
+        raise Http404
+
     positions = Position.objects.all()
     times = Time.objects.filter(party=next_party).order_by('beginning')
 
@@ -38,7 +42,7 @@ def enter(request):
     if request.method == 'POST':
         post = request.POST
         checked = post['checked'] == 'true'
-        next_party = _get_next_party()
+        next_party = Party.objects.get(id=_get_next_party())
         time = Time.objects.get(id=post['time'], party=next_party)
         position = Position.objects.get(id=post['position'], party=next_party)
         user = request.user
@@ -68,4 +72,4 @@ def _get_next_party():
     next_partys = Party.objects.filter(date__gte=date.today()).order_by('date')
     if len(next_partys) == 0:
         return
-    return next_partys[0]
+    return next_partys[0].id
