@@ -1,35 +1,14 @@
+from hypothesis.extra.django import models, TestCase as hyp_TestCase
 from django.test import TestCase
 from PartyShiftSchedule.views import pad_list
+from hypothesis import given
+from hypothesis.strategies import lists, randoms, integers
 
 
-class PadListTest(TestCase):
+class PadListTest(hyp_TestCase):
 
-    def test_non_empty_list_positive_pad(self):
-        self.assertEqual(
-            pad_list([None], '/', 3),
-            [None, '/', '/', '/']
-        )
-
-    def test_empty_list_positive_pad(self):
-        self.assertEqual(
-            pad_list([], '/', 3),
-            ['/', '/', '/']
-        )
-
-    def test_empty_list_zero_pad(self):
-        self.assertEqual(
-            pad_list([], None, 0),
-            []
-        )
-
-    def test_empty_list_negativ_pad(self):
-        self.assertEqual(
-            pad_list([], None, -1),
-            []
-        )
-
-    def test_empty_list_None_pad(self):
-        self.assertEqual(
-            pad_list([], None, 3),
-            [None, None, None]
-        )
+    @given(l=lists(randoms()), pad=randoms(), c=integers(min_value=-10000, max_value=10000))
+    def test_pad_list(self, l, pad, c):
+        padded_list = pad_list(l, pad, c)
+        assert isinstance(padded_list, list)
+        assert padded_list[:len(l)] == l
