@@ -44,8 +44,8 @@ def enter(request):
         post = request.POST
         checked = post['checked'] == 'true'
         next_event = Event.objects.get(id=_get_next_event())
-        time = Time.objects.get(id=post['time'], party=next_event)
-        position = Position.objects.get(id=post['position'], party=next_event)
+        time = Time.objects.get(id=post['time'], event=next_event)
+        position = Position.objects.get(id=post['position'], event=next_event)
         user = request.user
 
         slot = Slot.objects.filter(time=time, position=position, user=user)
