@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-
+from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 import itertools
 
@@ -34,7 +34,7 @@ def shift_schedule_event(request, event_id):
         'times': times,
         'user': request.user,
         # guessed value for when a table should be fliped
-        'transpose': len(times) / len(positions) < 0.5 if len(positions) <= 0 else False
+        'transpose': len(times) / len(positions) < 0.5 if len(positions) > 0 else False
     }
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
 
@@ -44,12 +44,15 @@ def enter(request):
     if request.method == 'POST':
         post = request.POST
         checked = post['checked'] == 'true'
-        next_event = Event.objects.get(id=_get_next_event())
-        time = Time.objects.get(id=post['time'], event=next_event)
-        position = Position.objects.get(id=post['position'], event=next_event)
-        user = request.user
+        try:
+            next_event = Event.objects.get(id=_get_next_event())
+            time = Time.objects.get(id=post['time'], event=next_event)
+            position = Position.objects.get(id=post['position'], event=next_event)
+            user = request.user
 
-        slot = Slot.objects.filter(time=time, position=position, user=user)
+            slot = Slot.objects.filter(time=time, position=position, user=user)
+        except (ObjectDoesNotExist, NoNextEventException) as e:
+            return HttpResponse(status=404)
 
         if not slot.exists() and checked:
             Slot(time=time, position=position, user=user).save()
@@ -71,7 +74,18 @@ def pad_list(l, pad, c):
 
 
 def _get_next_event():
-    next_events = Event.objects.filter(date__gte=date.today()).order_by('date')
-    if len(next_events) == 0:
-        return
-    return next_events[0].id
+    next_events = Event.objects.filter(date__gte=date.today())
+    if len(next_events) <= 0:
+        raise NoNextEventException(
+            message="There are no upcoming Events!",
+            errors=["next_events = {}".format(len(next_events))]
+        )
+    return next_events.order_by('date')[0].id
+
+
+class NoNextEventException(Exception):
+    def __init__(self, message, errors):
+        # Call the base class constructor with the parameters it needs
+        super(NoNextEventException, self).__init__(message)
+
+        self.errors = errors
