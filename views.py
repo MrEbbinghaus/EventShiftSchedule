@@ -16,24 +16,26 @@ def pss_landing(request):
 
 @login_required()
 def shift_schedule(request):
-    return redirect("event/{}".format(_get_next_event()))
+    try:
+        return redirect("event/{}".format(_get_next_event()))
+    except NoNextEventException:
+        return HttpResponse(status=404)
 
 
 @login_required()
 def shift_schedule_event(request, event_id):
     try:
         next_event = Event.objects.get(id=event_id)
-    except Event.DoesNotExist:
-        raise Http404
-
-    positions = Position.objects.filter(event=next_event)
-    times = Time.objects.filter(event=next_event).order_by('beginning')
+        positions = Position.objects.filter(event=next_event)
+        times = Time.objects.filter(event=next_event).order_by('beginning')
+    except ObjectDoesNotExist as e:
+        raise HttpResponse(status=404)
 
     context = {
         'positions': positions,
         'times': times,
         'user': request.user,
-        # guessed value for when a table should be fliped
+        # guessed value for when a table should be flipped
         'transpose': len(times) / len(positions) < 0.5 if len(positions) > 0 else False
     }
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
