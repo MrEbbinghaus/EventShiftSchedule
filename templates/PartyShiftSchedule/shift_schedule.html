@@ -1,0 +1,37 @@
+{% extends "base_nav.html" %}
+{% load staticfiles %}
+
+{% load schedule_table_tags %}
+
+{% block heading%}
+    <script src="{% static  "PartyShiftSchedule/js/main.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row shift-schedule">
+        <table class="table {% if transpose %}table-transposed{% endif %}">
+            <thead>
+            <tr>
+                <th>Zeit</th>
+                {% for position in positions %}
+                    <th>{{ position.name }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for time in times %}
+                <tr id="row_{{ time.id }}">
+                <td>{{ time.beginning|date:"H:i"}}</td>
+                {% for position in positions %}
+                    <td>
+                    {% table_block time position user %}
+                    </td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
