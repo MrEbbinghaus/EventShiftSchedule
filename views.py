@@ -33,7 +33,8 @@ def shift_schedule_event(request, event_id):
         'positions': positions,
         'times': times,
         'user': request.user,
-        'transpose': len(times) / len(positions) < 0.5  # guessed value for when a table should be fliped
+        # guessed value for when a table should be fliped
+        'transpose': len(times) / len(positions) < 0.5 if len(positions) <= 0 else False
     }
     return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
 
