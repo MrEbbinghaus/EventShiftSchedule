@@ -22,7 +22,11 @@
             <tbody>
             {% for time in times %}
                 <tr id="row_{{ time.id }}">
-                <td>{{ time.beginning|date:"H:i"}}</td>
+                <td>
+                  {% if time.alt_name %}{{ time.alt_name }}
+                  {% else %}{{ time.beginning|date:"H:i"}} {% endif %}
+                </td>
+
                 {% for position in positions %}
                     <td>
                     {% table_block time position user %}
