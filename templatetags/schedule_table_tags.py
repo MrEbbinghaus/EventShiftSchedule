@@ -17,18 +17,23 @@ def schedule_table_row(row):
 @register.inclusion_tag('PartyShiftSchedule/table_entry_block.html')
 def table_block(time, position, user):
     signed_up = signed_up_for(user=user, time=time, position=position)
-    entrys = Slot.objects.filter(time=time, position=position).exclude(user=user)
-    if (user.first_name is not '') or (user.last_name is not ''):
-        user = " ".join([user.first_name, user.last_name])
+    entrys = [to_full_name(slot.user) for slot in Slot.objects.filter(time=time, position=position).exclude(user=user)]
+    user = to_full_name(user)
 
     return {
-        'entrys': list(entrys),
+        'entrys': entrys,
         'time_id': time.id,
         'position_id': position.id,
         'free_slot': len(entrys) < position.pref_users or signed_up,
         'precheck': 'checked' if signed_up else 'unchecked',
         'user': user,
     }
+
+
+def to_full_name(user):
+    if (user.first_name is not '') or (user.last_name is not ''):
+        return " ".join([user.first_name, user.last_name])
+    return user
 
 
 def signed_up_for(user, time, position):
