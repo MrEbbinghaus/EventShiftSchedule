@@ -1,0 +1,2 @@
+hypothesis-django==2.0.0
+django-widget-tweaks=1.4.1

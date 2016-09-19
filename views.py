@@ -9,9 +9,9 @@ import itertools
 from .models import Slot, Position, Event, Time
 
 
-def pss_landing(request):
+def ess_landing(request):
     user = request.user
-    return render(request, 'PartyShiftSchedule/landing_page.html', {'username': user})
+    return render(request, 'EventShiftSchedule/landing_page.html', {'username': user})
 
 
 @login_required()
@@ -38,7 +38,7 @@ def shift_schedule_event(request, event_id):
         # guessed value for when a table should be flipped
         'transpose': len(times) / len(positions) < 0.5 if len(positions) > 0 else False
     }
-    return render(request, 'PartyShiftSchedule/shift_schedule.html', context=context)
+    return render(request, 'EventShiftSchedule/shift_schedule.html', context=context)
 
 
 @login_required()

@@ -1,7 +1,7 @@
 from hypothesis.extra.django import models, TestCase as hyp_TestCase
 from django.test import TestCase, Client
 
-from PartyShiftSchedule import views
+from EventShiftSchedule import views
 from InphimaHelperCoordinator import settings
 from hypothesis import given, assume
 from hypothesis.strategies import lists, randoms, integers, booleans, text
@@ -35,7 +35,7 @@ class NoEventTest(hyp_TestCase):
            time=integers(min_value=0, max_value=2**31-1),
            position=integers(min_value=0, max_value=2**31-1))
     def post_enter(self, status_code, checked, time, position):
-        response = self.client.post(reverse('PartyShiftSchedule:enter'), {
+        response = self.client.post(reverse('EventShiftSchedule:enter'), {
             "checked": checked,
             "time": time,
             "position": position}
@@ -46,6 +46,6 @@ class NoEventTest(hyp_TestCase):
         self.post_enter(status_code=500)
 
     def test_shift_schedule_no_500(self):
-        response = self.client.get(reverse('PartyShiftSchedule:shift_schedule'))
+        response = self.client.get(reverse('EventShiftSchedule:shift_schedule'))
         assert response.status_code != 500
 

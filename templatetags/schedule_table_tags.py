@@ -1,5 +1,5 @@
 from django import template
-from PartyShiftSchedule.models import Slot
+from EventShiftSchedule.models import Slot
 
 register = template.Library()
 
@@ -14,7 +14,7 @@ def schedule_table_row(row):
     """.format(row[0], '\n'.join(map(to_td, row[1:])))
 
 
-@register.inclusion_tag('PartyShiftSchedule/table_entry_block.html')
+@register.inclusion_tag('EventShiftSchedule/table_entry_block.html')
 def table_block(time, position, user):
     signed_up = signed_up_for(user=user, time=time, position=position)
     entrys = [to_full_name(slot.user) for slot in Slot.objects.filter(time=time, position=position).exclude(user=user)]
