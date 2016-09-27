@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 import itertools
 
-from .models import Slot, Position, Event, Time
+from .models import Slot, Position, Event, Time, OneTimePosition, otpSlot
 
 
 def ess_landing(request):
@@ -28,10 +28,12 @@ def shift_schedule_event(request, event_id):
         next_event = Event.objects.get(id=event_id)
         positions = Position.objects.filter(event=next_event)
         times = Time.objects.filter(event=next_event).order_by('beginning')
+        oneTimePositions = OneTimePosition.objects.filter(event=next_event).order_by('time')
     except ObjectDoesNotExist as e:
         raise HttpResponse(status=404)
 
     context = {
+        'oneTimePositions' : oneTimePositions,
         'positions': positions,
         'times': times,
         'user': request.user,
@@ -63,6 +65,33 @@ def enter(request):
             slot[0].delete()
 
         print("Debug: {0} {1} {2}".format(post['checked'], post['time'], post['position']))
+
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=405)  # 405: Method not allowed
+
+
+@login_required()
+def enter_otp(request):
+    if request.method == 'POST':
+        post = request.POST
+        checked = post['checked'] == 'true'
+        try:
+            next_event = Event.objects.get(id=_get_next_event())
+            oneTimePosition = OneTimePosition.objects.get(id=post['position'], event=next_event)
+            user = request.user
+
+            slot = otpSlot.objects.filter(otPosition=oneTimePosition, user=user)
+        except (ObjectDoesNotExist, NoNextEventException) as e:
+            return HttpResponse(status=404)
+
+        if not slot.exists() and checked:
+            otpSlot(otPosition=oneTimePosition, user=user).save()
+
+        elif slot.exists() and not checked:
+            slot[0].delete()
+
+        print("Debug: {0} {1}".format(post['checked'], post['position']))
 
         return HttpResponse(status=200)
 

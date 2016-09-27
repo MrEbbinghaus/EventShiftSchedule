@@ -1,5 +1,5 @@
 from django import template
-from EventShiftSchedule.models import Slot
+from EventShiftSchedule.models import Slot, otpSlot
 
 register = template.Library()
 
@@ -29,6 +29,20 @@ def table_block(time, position, user):
         'user': user,
     }
 
+@register.inclusion_tag('EventShiftSchedule/otp_table_entry_block.html')
+def otp_table_block(oneTimePosition, user):
+    signed_up = signed_up_for_otp(user=user, oneTimePosition=oneTimePosition)
+    entries = otpSlot.objects.filter(otPosition=oneTimePosition).count()
+    user = to_full_name(user)
+
+    return {
+        'entries': entries,
+        'position_id': oneTimePosition.id,
+        'precheck': 'checked' if signed_up else 'unchecked',
+        'user': user,
+    }
+
+
 
 def to_full_name(user):
     if (user.first_name is not '') or (user.last_name is not ''):
@@ -46,3 +60,6 @@ def to_td(value):
 
 def toggle_button(user):
     return "<a class=tableToggleButton>{0}</a>".format(user)
+
+def signed_up_for_otp(user, oneTimePosition):
+    return otpSlot.objects.filter(user=user, otPosition=oneTimePosition).exists()

@@ -9,6 +9,26 @@
 
 {% block content %}
 
+        <div class="row">
+        {% for oneTimePos in oneTimePositions %}
+            <div class="col-md-6">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th colspan="3">{{ oneTimePos.name }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ oneTimePos.time|date:"l H:i"}}</td>
+                            {% otp_table_block oneTimePos user %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+        </div>
+
     <div class="row shift-schedule">
         <table class="table {% if transpose %}table-transposed{% endif %}">
             <thead>
