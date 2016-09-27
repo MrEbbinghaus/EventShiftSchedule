@@ -1,12 +1,13 @@
+from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_list_or_404, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 import itertools
 
-from .models import Slot, Position, Event, Time
+from .models import *
 
 
 def ess_landing(request):
@@ -17,7 +18,7 @@ def ess_landing(request):
 @login_required()
 def shift_schedule(request):
     try:
-        return redirect("event/{}".format(_get_next_event()))
+        return redirect("event/{}".format(Event.objects.earliest().id))
     except NoNextEventException:
         return HttpResponse(status=404)
 
@@ -25,18 +26,28 @@ def shift_schedule(request):
 @login_required()
 def shift_schedule_event(request, event_id):
     try:
-        next_event = Event.objects.get(id=event_id)
+        next_event = Event.objects.earliest().id
         positions = Position.objects.filter(event=next_event)
         times = Time.objects.filter(event=next_event).order_by('beginning')
-    except ObjectDoesNotExist as e:
-        raise HttpResponse(status=404)
+
+    except ObjectDoesNotExist:
+        return HttpResponse(status=400)
+
+    try:
+        comment = Comment.objects.get(user=request.user, event=next_event)
+    except Comment.DoesNotExist:
+        comment = None
 
     context = {
         'positions': positions,
         'times': times,
         'user': request.user,
+
         # guessed value for when a table should be flipped
-        'transpose': len(times) / len(positions) < 0.5 if len(positions) > 0 else False
+        'transpose': len(times) / len(positions) < 0.5 if len(positions) > 0 else False,
+
+        'event_id': event_id,
+        'preset_comment': comment.value if comment else "",
     }
     return render(request, 'EventShiftSchedule/shift_schedule.html', context=context)
 
@@ -47,14 +58,14 @@ def enter(request):
         post = request.POST
         checked = post['checked'] == 'true'
         try:
-            next_event = Event.objects.get(id=_get_next_event())
+            next_event = Event.objects.earliest().id
             time = Time.objects.get(id=post['time'], event=next_event)
             position = Position.objects.get(id=post['position'], event=next_event)
             user = request.user
 
             slot = Slot.objects.filter(time=time, position=position, user=user)
-        except (ObjectDoesNotExist, NoNextEventException) as e:
-            return HttpResponse(status=404)
+        except (ObjectDoesNotExist, NoNextEventException):
+            return HttpResponse(status=400)
 
         if not slot.exists() and checked:
             Slot(time=time, position=position, user=user).save()
@@ -69,6 +80,26 @@ def enter(request):
     return HttpResponse(status=405)  # 405: Method not allowed
 
 
+@login_required()
+def add_comment(request):
+    if request.method == 'POST':
+        post = request.POST
+        try:
+            Comment.objects.update_or_create(
+                user=request.user,
+                event=get_object_or_404(Event, id=post.get('event_id')),
+                defaults={'value': post.get('comment-value')})
+
+        except Http404:
+            print("event_id: {}".format(post.get('event_id')))
+            return HttpResponse(status=400)
+
+        # redirect back
+        return redirect(reverse("EventShiftSchedule:shift_schedule_event", args=[post.get('event_id')]))
+    else:
+        return HttpResponse(status=405)  # 405: Method not allowed
+
+
 def pad_list(l, pad, c):
     for _ in itertools.repeat(None, c):
         l.append(pad)
@@ -76,13 +107,7 @@ def pad_list(l, pad, c):
 
 
 def _get_next_event():
-    next_events = Event.objects.filter(date__gte=date.today())
-    if len(next_events) <= 0:
-        raise NoNextEventException(
-            message="There are no upcoming Events!",
-            errors=["next_events = {}".format(len(next_events))]
-        )
-    return next_events.order_by('date')[0].id
+    return Event.objects.earliest()
 
 
 class NoNextEventException(Exception):
