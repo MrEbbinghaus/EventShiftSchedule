@@ -5,22 +5,12 @@ from hypothesis import given
 from hypothesis.extra.django import TestCase as hyp_TestCase
 from hypothesis.extra.django.models import models as hyp_models
 from hypothesis.extra.datetime import dates
-from hypothesis.strategies import lists, randoms, integers, booleans, text, just
+from hypothesis.strategies import integers, booleans, text, just
 
 from datetime import date
 
-from EventShiftSchedule import views
 from EventShiftSchedule.models import *
-from InphimaHelperCoordinator import settings # FIXME: This doesn't work with a capsuled app!
-
-
-class PadListTest(hyp_TestCase):
-
-    @given(l=lists(randoms()), pad=randoms(), c=integers(min_value=-1000, max_value=1000))
-    def test_pad_list(self, l, pad, c):
-        padded_list = views.pad_list(l, pad, c)
-        assert isinstance(padded_list, list)
-        assert padded_list[:len(l)] == l
+from InphimaHelperCoordinator import settings  # FIXME: This doesn't work with a capsuled app!
 
 
 class NoEventTest(hyp_TestCase):

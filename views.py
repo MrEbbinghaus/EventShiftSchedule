@@ -128,12 +128,6 @@ def enter_otp(request):
     return HttpResponse(status=405)  # 405: Method not allowed
 
 
-def pad_list(l, pad, c):
-    for _ in itertools.repeat(None, c):
-        l.append(pad)
-    return l
-
-
 def _get_next_event():
     """deprecated"""
     return Event.objects.earliest()
