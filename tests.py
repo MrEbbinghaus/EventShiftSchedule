@@ -22,12 +22,18 @@ class NoEventTest(hyp_TestCase):
         self.user = hyp_models(User, last_login=just("2099-12-31"), date_joined=just("2099-12-31")).example()
         self.client = Client()
         self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
-        response = self.client.post(reverse('EventShiftSchedule:enter'), {
+        response_enter = self.client.post(reverse('EventShiftSchedule:enter'), {
             "checked": checked,
             "time": time,
             "position": position
         })
-        assert response.status_code != status_code
+        response_opt_enter = self.client.post(reverse('EventShiftSchedule:enter_otp'), {
+            "checked": checked,
+            "time": time,
+            "position": position
+        })
+        assert response_enter.status_code != status_code
+        assert response_opt_enter.status_code != status_code
         self.user.delete()
 
     def test_enter_no_500(self):

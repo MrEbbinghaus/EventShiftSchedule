@@ -108,10 +108,10 @@ def enter_otp(request):
         checked = post['checked'] == 'true'
         try:
             next_event = _get_next_event()
-            oneTimePosition = OneTimePosition.objects.get(id=post['position'], event=next_event)
+            one_time_position = OneTimePosition.objects.get(id=post['position'], event=next_event)
             user = request.user
 
-            slot = otpSlot.objects.filter(otPosition=oneTimePosition, user=user)
+            slot = otpSlot.objects.filter(otPosition=one_time_position, user=user)
         except (ObjectDoesNotExist, NoNextEventException):
             return HttpResponse(status=404)
 
