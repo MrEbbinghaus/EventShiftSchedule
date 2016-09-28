@@ -27,8 +27,11 @@ function handleToggleOtpButton(toggleObj) {
     })
         .done(function() {
             var entries_field = document.getElementById('otp-' + toggleObj.dataset.position);
-            if (toggleObj.checked) entries_field.innerHTML = parseInt(entries_field.innerHTML) + 1;
-            else entries_field.innerHTML = parseInt(entries_field.innerHTML) - 1;
+            var mod = toggleObj.checked? 1: -1;
+            var valueOfEntries_field = parseInt(entries_field.innerHTML);
+
+            if (mod > 0 || valueOfEntries_field > 0)
+                entries_field.innerHTML = valueOfEntries_field + mod;
         })
         .fail(function() {
             console.log("Enter failed!");
