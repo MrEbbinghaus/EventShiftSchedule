@@ -1,0 +1,15 @@
+<td>
+  <div>
+    <span class="button-checkbox">
+                        <button id="button-checkbox-{{ position_id }}" type="button" class="btn btn-block button-checkbox-btn" data-color="primary">Ich helfe!</button>
+                        <input type="checkbox" class="hidden"
+                               onchange="handleToggleOtpButton(this)"
+                               data-entries="{{ entries }}"
+                               data-position="{{ position_id }}"
+                               data-csrftoken="{{ csrf_token }}" {{ precheck }}>
+    </span>
+  </div>
+</td>
+<td>
+  <span id="otp-{{ position_id }}">{{ entries }}</span>  gemeldet
+</td>

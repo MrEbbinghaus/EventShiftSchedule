@@ -19,6 +19,22 @@ function handleToggleButton(toggleObj) {
         });
 }
 
+function handleToggleOtpButton(toggleObj) {
+    $.post('post/enter/otp/', {
+        checked: toggleObj.checked,
+        position: toggleObj.dataset.position,
+        csrfmiddlewaretoken: toggleObj.dataset.csrftoken
+    })
+        .done(function() {
+            var entries_field = document.getElementById('otp-' + toggleObj.dataset.position);
+            if (toggleObj.checked) entries_field.innerHTML = parseInt(entries_field.innerHTML) + 1;
+            else entries_field.innerHTML = parseInt(entries_field.innerHTML) - 1;
+        })
+        .fail(function() {
+            console.log("Enter failed!");
+        });
+}
+
 function toggleAllInHisRow(button, disable){
     $(button).closest('tr').find('.button-checkbox-btn').each(function () {
         var $button = $(this);

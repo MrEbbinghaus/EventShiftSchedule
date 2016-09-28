@@ -70,3 +70,28 @@ class Comment(models.Model):
         display = "{0} about: {1}"
         return display.format(str(self.user), self.event)
 
+
+# für Auf- und Abbauschichten
+class OneTimePosition(models.Model):
+    name = models.CharField(max_length=32)
+    time = models.DateTimeField()
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('time', 'event')
+
+    def __str__(self):
+        display = '{0}: {1}'
+        return display.format(self.time.time().strftime('%a %H:%M'), self.name)
+
+
+class otpSlot(models.Model):
+    otPosition = models.ForeignKey(OneTimePosition, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'otPosition')
+
+    def __str__(self):
+        display = '{0}: {1}'
+        return display.format(self.user, str(self.otPosition))
