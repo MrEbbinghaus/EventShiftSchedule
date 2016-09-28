@@ -59,7 +59,7 @@ class Slot(models.Model):
 
 
 class Comment(models.Model):
-    value = models.TextField()
+    value = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 

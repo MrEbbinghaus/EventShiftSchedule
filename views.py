@@ -6,8 +6,9 @@ from django.shortcuts import redirect, get_list_or_404, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 import itertools
+import warnings
 
-from .models import Slot, Position, Event, Time, OneTimePosition, otpSlot
+from .models import Slot, Position, Event, Time, OneTimePosition, otpSlot, Comment
 
 
 def ess_landing(request):
@@ -93,7 +94,6 @@ def add_comment(request):
                 defaults={'value': post.get('comment-value')})
 
         except Http404:
-            print("event_id: {}".format(post.get('event_id')))
             return HttpResponse(status=400)
 
         # redirect back
@@ -107,12 +107,12 @@ def enter_otp(request):
         post = request.POST
         checked = post['checked'] == 'true'
         try:
-            next_event = Event.objects.get(id=_get_next_event())
+            next_event = _get_next_event()
             oneTimePosition = OneTimePosition.objects.get(id=post['position'], event=next_event)
             user = request.user
 
             slot = otpSlot.objects.filter(otPosition=oneTimePosition, user=user)
-        except (ObjectDoesNotExist, NoNextEventException) as e:
+        except (ObjectDoesNotExist, NoNextEventException):
             return HttpResponse(status=404)
 
         if not slot.exists() and checked:
@@ -135,6 +135,7 @@ def pad_list(l, pad, c):
 
 
 def _get_next_event():
+    """deprecated"""
     return Event.objects.earliest()
 
 
