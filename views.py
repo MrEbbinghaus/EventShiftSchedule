@@ -116,7 +116,7 @@ def enter_otp(request):
             return HttpResponse(status=404)
 
         if not slot.exists() and checked:
-            otpSlot(otPosition=oneTimePosition, user=user).save()
+            otpSlot(otPosition=one_time_position, user=user).save()
 
         elif slot.exists() and not checked:
             slot[0].delete()
