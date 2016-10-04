@@ -29,6 +29,7 @@ def table_block(time, position, user):
         'user': user,
     }
 
+
 @register.inclusion_tag('EventShiftSchedule/otp_table_entry_block.html')
 def otp_table_block(oneTimePosition, user):
     signed_up = signed_up_for_otp(user=user, oneTimePosition=oneTimePosition)
@@ -41,7 +42,6 @@ def otp_table_block(oneTimePosition, user):
         'precheck': 'checked' if signed_up else 'unchecked',
         'user': user,
     }
-
 
 
 def to_full_name(user):
