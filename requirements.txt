@@ -1,1 +1,1 @@
-hypothesis-django==2.0.0
+hypothesis[django]==3.4.2
