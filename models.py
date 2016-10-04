@@ -55,7 +55,7 @@ class Slot(models.Model):
 
     def __str__(self):
         display = "{0}: {1}, {2} Uhr"
-        return display.format(str(self.user), self.position, str(self.time))
+        return display.format(to_full_name(self.user), self.position, str(self.time))
 
 
 class Comment(models.Model):
@@ -68,7 +68,7 @@ class Comment(models.Model):
 
     def __str__(self):
         display = "{0} about: {1}"
-        return display.format(str(self.user), self.event)
+        return display.format(to_full_name(self.user), self.event)
 
 
 # für Auf- und Abbauschichten
@@ -94,4 +94,9 @@ class otpSlot(models.Model):
 
     def __str__(self):
         display = '{0}: {1}'
-        return display.format(self.user, str(self.otPosition))
+        return display.format(to_full_name(self.user), str(self.otPosition))
+
+def to_full_name(user):
+    if (user.first_name is not '') or (user.last_name is not ''):
+        return " ".join([user.first_name, user.last_name])
+    return user
