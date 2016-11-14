@@ -27,7 +27,7 @@ def shift_schedule(request):
 @login_required()
 def shift_schedule_event(request, event_id):
     try:
-        next_event = Event.objects.earliest().id
+        next_event = get_object_or_404(Event, id=event_id)
         positions = Position.objects.filter(event=next_event)
         times = Time.objects.filter(event=next_event).order_by('beginning')
         oneTimePositions = OneTimePosition.objects.filter(event=next_event).order_by('time')
