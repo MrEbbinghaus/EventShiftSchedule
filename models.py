@@ -39,10 +39,12 @@ class Time(models.Model):
         unique_together = ('beginning', 'duration', 'event')
 
     def __str__(self):
-        display = "{0} - {1}"
+        display = "{0} - {1} am {2}" + (" {0}".format(self.alt_name) if self.alt_name else "")
         ending = self.beginning + timedelta(hours=self.duration)
 
-        return display.format(self.beginning.time().strftime("%H:%M"), ending.time().strftime("%H:%M"))
+        return display.format(self.beginning.time().strftime("%H:%M"),
+                              ending.time().strftime("%H:%M"),
+                              self.beginning.date())
 
 
 class Slot(models.Model):
@@ -95,6 +97,7 @@ class otpSlot(models.Model):
     def __str__(self):
         display = '{0}: {1}'
         return display.format(to_full_name(self.user), str(self.otPosition))
+
 
 def to_full_name(user):
     if (user.first_name is not '') or (user.last_name is not ''):
