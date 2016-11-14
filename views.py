@@ -34,7 +34,6 @@ def shift_schedule_event(request, event_id):
 
     except ObjectDoesNotExist:
         return HttpResponse(status=400)
-
     try:
         comment = Comment.objects.get(user=request.user, event=next_event)
     except Comment.DoesNotExist:
@@ -61,9 +60,10 @@ def enter(request):
         post = request.POST
         checked = post['checked'] == 'true'
         try:
-            next_event = Event.objects.earliest().id
-            time = Time.objects.get(id=post['time'], event=next_event)
-            position = Position.objects.get(id=post['position'], event=next_event)
+            position = Position.objects.get(id=post['position'])
+            event = position.event
+            time = Time.objects.get(id=post['time'], event=event)
+
             user = request.user
 
             slot = Slot.objects.filter(time=time, position=position, user=user)
@@ -107,8 +107,8 @@ def enter_otp(request):
         post = request.POST
         checked = post['checked'] == 'true'
         try:
-            next_event = _get_next_event()
-            one_time_position = OneTimePosition.objects.get(id=post['position'], event=next_event)
+            one_time_position = OneTimePosition.objects.get(id=post['position'])
+            event = one_time_position.event
             user = request.user
 
             slot = otpSlot.objects.filter(otPosition=one_time_position, user=user)
@@ -129,8 +129,7 @@ def enter_otp(request):
 
 
 def _get_next_event():
-    """deprecated"""
-    return Event.objects.earliest()
+    return Event.objects.filter(date__gte=date.today())
 
 
 class NoNextEventException(Exception):
