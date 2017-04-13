@@ -15,9 +15,9 @@
     <span id="otp-{{ position_id }}">{{ entries|length }}</span>  gemeldet
   </a>
   <div class="collapse" id="otp-collapse-{{ position_id }}">
-    <ul class="list-group boderless">
+    <ul class="list-group">
     {% for entry in entries %}
-      <li class="list-group-item boderless" style="padding: 5px">{{ entry }}</li>
+      <li class="list-group-item" style="padding: 5px">{{ entry }}</li>
     {% endfor %}
     </ul>
   </div>
