@@ -46,7 +46,7 @@ def shift_schedule_event(request, event_id):
         # guessed value for when a table should be flipped
         'transpose': len(times) / len(positions) < 0.5 if len(positions) > 0 else False,
 
-        'event_id': event_id,
+        'event': next_event,
         'preset_comment': comment.value if comment else "",
     }
     return render(request, 'EventShiftSchedule/shift_schedule.html', context=context)
