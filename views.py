@@ -5,15 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_list_or_404, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
-import itertools
-import warnings
 
 from .models import Slot, Position, Event, Time, OneTimePosition, otpSlot, Comment
 
 
 def ess_landing(request):
-    user = request.user
-    return render(request, 'EventShiftSchedule/landing_page.html', {'username': user})
+    events = Event.objects.all()
+    return render(request, 'EventShiftSchedule/landing_page.html', {'events': events})
 
 
 @login_required()
@@ -40,7 +38,7 @@ def shift_schedule_event(request, event_id):
         comment = None
 
     context = {
-        'oneTimePositions' : oneTimePositions,
+        'oneTimePositions': oneTimePositions,
         'positions': positions,
         'times': times,
         'user': request.user,
@@ -101,7 +99,7 @@ def add_comment(request):
     else:
         return HttpResponse(status=405)  # 405: Method not allowed
 
-
+@login_required()
 def enter_otp(request):
     if request.method == 'POST':
         post = request.POST

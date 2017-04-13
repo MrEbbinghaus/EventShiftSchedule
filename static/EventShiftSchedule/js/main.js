@@ -41,7 +41,7 @@ function handleToggleOtpButton(toggleObj) {
 function toggleAllInHisRow(button, disable){
     $(button).closest('tr').find('.button-checkbox-btn').each(function () {
         var $button = $(this);
-        if($button.attr('id') == button.attr('id')) return;
+        if($button.attr('id') === button.attr('id')) return;
         if (disable) $button.addClass('disabled');
         else $button.removeClass('disabled');
         $button.prop('disabled', disable);
@@ -136,7 +136,7 @@ $(function () {
             updateDisplay();
 
             // Inject the icon if applicable
-            if ($button.find('.state-icon').length == 0) {
+            if ($button.find('.state-icon').length === 0) {
                 $button.prepend('<i class="state-icon ' + settings[$button.data('state')].icon + '"></i> ');
             }
         }

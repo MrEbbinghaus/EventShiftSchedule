@@ -1,7 +1,13 @@
 {% extends "base_nav.html" %}
 
 {% block content %}
-<h1>Hello World!</h1>
+<h1>Partys</h1>
 
-Good to see you, {{ username }}!
+<ul class="list-group">
+  {% for event in events %}
+    <li class="list-group-item list-group-item-header">
+      <a  href="{% url 'EventShiftSchedule:shift_schedule_event' event.id %}">{{ event.date }}: {{ event.name }}</a>
+    </li>
+  {% endfor %}
+</ul>
 {% endblock %}
