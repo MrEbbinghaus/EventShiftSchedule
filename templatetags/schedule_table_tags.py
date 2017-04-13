@@ -17,30 +17,29 @@ def schedule_table_row(row):
 @register.inclusion_tag('EventShiftSchedule/table_entry_block.html')
 def table_block(time, position, user):
     signed_up = signed_up_for(user=user, time=time, position=position)
-    entrys = [to_full_name(slot.user) for slot in Slot.objects.filter(time=time, position=position).exclude(user=user)]
+    entries = [to_full_name(slot.user) for slot in Slot.objects.filter(time=time, position=position).exclude(user=user)]
     user = to_full_name(user)
 
     return {
-        'entrys': entrys,
+        'entries': entries,
         'time_id': time.id,
         'position_id': position.id,
-        'free_slot': len(entrys) < position.pref_users or signed_up,
+        'free_slot': len(entries) < position.pref_users or signed_up,
         'precheck': 'checked' if signed_up else 'unchecked',
         'user': user,
     }
 
 
 @register.inclusion_tag('EventShiftSchedule/otp_table_entry_block.html')
-def otp_table_block(oneTimePosition, user):
-    signed_up = signed_up_for_otp(user=user, oneTimePosition=oneTimePosition)
-    entries = otpSlot.objects.filter(otPosition=oneTimePosition).count()
-    user = to_full_name(user)
+def otp_table_block(one_time_position, user):
+    signed_up = signed_up_for_otp(user=user, oneTimePosition=one_time_position)
+    entries = [to_full_name(slot.user) for slot in otpSlot.objects.filter(otPosition=one_time_position)]
 
     return {
         'entries': entries,
-        'position_id': oneTimePosition.id,
+        'position_id': one_time_position.id,
         'precheck': 'checked' if signed_up else 'unchecked',
-        'user': user,
+        'user': to_full_name(user),
     }
 
 

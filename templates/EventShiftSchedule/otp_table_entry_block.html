@@ -11,5 +11,14 @@
   </div>
 </td>
 <td>
-  <span id="otp-{{ position_id }}">{{ entries }}</span>  gemeldet
+  <a data-toggle="collapse" href="#otp-collapse-{{ position_id }}">
+    <span id="otp-{{ position_id }}">{{ entries|length }}</span>  gemeldet
+  </a>
+  <div class="collapse" id="otp-collapse-{{ position_id }}">
+    <ul class="list-group boderless">
+    {% for entry in entries %}
+      <li class="list-group-item boderless" style="padding: 5px">{{ entry }}</li>
+    {% endfor %}
+    </ul>
+  </div>
 </td>
