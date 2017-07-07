@@ -7,13 +7,14 @@ class Event(models.Model):
     date = models.DateField(blank=False)
     name = models.CharField(blank=True, max_length=64)
     location = models.TextField(blank=True)
+    disabled = models.BooleanField(blank=False, default=False)
     person_in_charge = models.ForeignKey(User, blank=True, null=True)
 
     class Meta:
         get_latest_by = 'date'
 
     def __str__(self):
-        return "{0} am {1}".format(self.name, self.date) if self.name \
+        return "{}{0} am {1}".format("" if self.disabled else "[DISABLED] ", self.name, self.date) if self.name \
             else str(self.date)
 
 
