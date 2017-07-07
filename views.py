@@ -15,14 +15,6 @@ def ess_landing(request):
 
 
 @login_required()
-def shift_schedule(request):
-    try:
-        return redirect("event/{}".format(Event.objects.earliest().id))
-    except NoNextEventException:
-        return HttpResponse(status=404)
-
-
-@login_required()
 def shift_schedule_event(request, event_id):
     try:
         next_event = get_object_or_404(Event, id=event_id)
