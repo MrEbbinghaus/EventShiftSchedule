@@ -10,7 +10,7 @@ from .models import Slot, Position, Event, Time, OneTimePosition, otpSlot, Comme
 
 
 def ess_landing(request):
-    events = Event.objects.all()
+    events = Event.objects.filter(disabled=False)
     return render(request, 'EventShiftSchedule/landing_page.html', {'events': events})
 
 
