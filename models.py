@@ -14,7 +14,7 @@ class Event(models.Model):
         get_latest_by = 'date'
 
     def __str__(self):
-        return "{}{0} am {1}".format("" if self.disabled else "[DISABLED] ", self.name, self.date) if self.name \
+        return "{0}{1} am {2}".format("[DISABLED] " if self.disabled else "", self.name, self.date) if self.name \
             else str(self.date)
 
 
