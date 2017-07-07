@@ -1,23 +1,25 @@
 <div>
   {% if free_slot %}
-            <span class="button-checkbox">
-                                <button id="button-checkbox-{{ time_id }}{{ position_id }}" type="button" class="btn btn-block button-checkbox-btn" data-color="primary">Ich helfe!</button>
-                                <input type="checkbox" class="hidden"
-                                       onchange="handleToggleButton(this)"
-                                       data-time="{{ time_id }}"
-                                       data-position="{{ position_id }}"
-                                       data-csrftoken="{{ csrf_token }}"
-                                    {{ precheck }}>
-                            </span>
-        {% endif %}
-    <ul class="list-group">
-        {% for entry in entries %}
-            <li class="list-group-item">{{ entry }}</li>
-        {% endfor %}
-        <li class="list-group-item" id="{{ time_id }}{{ position_id }}"
-                {% if precheck == "unchecked" %} style="opacity: 0" {% endif %}>
-          {{ user }}
-        </li>
+    <span class="button-checkbox">
+      <button id="button-checkbox-{{ time_id }}{{ position_id }}" type="button" class="btn btn-block button-checkbox-btn" data-color="primary">Ich helfe!</button>
+        <input type="checkbox" class="hidden"
+             onchange="handleToggleButton(this)"
+             data-time="{{ time_id }}"
+             data-position="{{ position_id }}"
+             data-csrftoken="{{ csrf_token }}"
+          {{ precheck }}>
+    </span>
+  {% endif %}
+  <ul class="list-group">
+    {% for entry in entries %}
+      <li class="list-group-item">{{ entry }}</li>
+    {% endfor %}
+    {% if qfree_slot %}
+    <li class="list-group-item" id="{{ time_id }}{{ position_id }}"
+        {% if precheck == "unchecked" %} style="opacity: 0" {% endif %}>
+      {{ user }}
+    </li>
+    {% endif %}
 
-    </ul>
+  </ul>
 </div>
